@@ -1,0 +1,19 @@
+{
+    "name": "reviews",
+    "version": "1.0.0",
+    "description": "",
+    "main": "main.js",
+    "dependencies": {
+        "@apollo/subgraph": "^2.4.2",
+        "@apollo/server": "^4.9.1",
+        "express": "4.18.2",
+        "graphql-tag": "^2.12.6",
+        "graphql": "^16.6.0"
+    },
+    "scripts": {
+        "start": "node main.js"
+    },
+    "author": "",
+    "license": "ISC",
+    "repository": "https://git.srvteam.com/congress/microservices/vod"
+}
