@@ -1,0 +1,58 @@
+# These are the subgraphs in this supergraph
+# They are deployed first, so they're running in the environment
+
+# When the subgraphs are ready to serve requests
+# we publish the subgraph schemas to the Apollo Registry
+
+# Apollo Registry then does:
+# - supergraph CI: composes the subgraphs into a supergraph schema
+# - supergraph CD: feeds new supergraph schema to the Apollo Router via Apollo Uplink polling every few seconds
+
+# Run 'make demo' to get started
+# then run 'make smoke' in separate window
+# or open http://localhost:4000 to use Apollo Sandbox to issue queries
+
+# Note this is the base docker-compose file for this project.
+# The paths in all other compose files are **relative to this file**, per:
+# https://docs.docker.com/compose/extends/#multiple-compose-files
+
+# see `./opentelemetry` `./misc/studio` and `./misc/local` for other compose files
+
+version: '3.9'
+services:
+  products:
+    container_name: products
+    image: node:14
+    ports:
+      - "4001:8080"
+    volumes:
+      - ./subgraphs/products:/usr/app
+    command: sh -c "cd /usr/app && npm i && npm run start"
+  reviews:
+    container_name: reviews
+    image: node:14
+    ports:
+      - "4002:8080"
+    volumes:
+      - ./subgraphs/reviews:/usr/app
+    command: sh -c "cd /usr/app && npm i && npm run start"
+  search:
+    container_name: search
+    image: node:14
+    ports:
+      - "4003:8080"
+    volumes:
+      - ./subgraphs/search:/usr/app
+    command: sh -c "cd /usr/app && npm i && npm run start"
+  supergraph:
+    image: ghcr.io/apollographql/router:v1.27.0
+    container_name: router
+    ports:
+      - 4007:4000
+    volumes:
+      - ./supergraph.graphql:/supergraph.graphql
+      - ./router.yaml:/dist/config/router.yaml
+    command: --supergraph=/supergraph.graphql
+    depends_on:
+      - products
+      - reviews
