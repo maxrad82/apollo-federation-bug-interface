@@ -23,18 +23,29 @@ let schema = {
 
         extend schema
         @link(url: "https://specs.apollo.dev/federation/v2.3",
-            import: ["@key", "@interfaceObject"])
+            import: ["@key"])
 
-        type Product @key(fields:"id") @interfaceObject {
+        interface Product @key(fields:"id") {
             id: ID!
-            reviews: [String!]!
+        }
+
+        type Book implements Product @key(fields:"id") {
+            id:ID!
+            title: String
+        }
+
+        type Query {
+            allProducts: [Product!]!
         }
     `,
     resolvers: {
         Product: {
             __resolveReference: ({ id }) => store.find(e => e.id === id),
-            reviews: () => ["a great product"]
+            __resolveType: () => "Book"
         },
+        Query: {
+            allProducts: () => store
+        }
     }
 }
 
